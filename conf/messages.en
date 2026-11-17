@@ -24,3 +24,11 @@ error.summary.title = There is a problem
 index.title = gcc-free-trade-agreement-frontend
 index.heading = gcc-free-trade-agreement-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
+
+search.title = search
+search.heading = Search Page
+search.checkYourAnswersLabel = search
+search.error.required = Enter search
+search.error.length = Search must be 100 characters or less
+search.change.hidden = Search
+search.hint = Hint text to be confirmed
