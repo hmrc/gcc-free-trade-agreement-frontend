@@ -26,30 +26,30 @@ import play.api.test.Helpers.*
 class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
 
   private val url = routes.SearchController.onPageLoad().url
-  
+
   "Search Controller" - {
     "must return OK for a GET" in {
       val result = route(app, FakeRequest(GET, url)).get
       status(result) mustEqual OK
-    }  
-    
+    }
+
     "must return OK for a POST with a valid alphanumeric term" in {
       val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "ABC123")
-      val result = route(app, request).get
+      val result  = route(app, request).get
       status(result) mustEqual OK
     }
-    
+
     "must return BAD_REQUEST for a POST with an empty term" in {
       val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "a" * 101)
-      val result = route(app, request).get
+      val result  = route(app, request).get
       status(result) mustEqual BAD_REQUEST
     }
 
     "must show the hint text above the search box on a GET" in {
       val messagesApi = app.injector.instanceOf[MessagesApi]
-      val hintText = messagesApi("search.hint")(Lang.defaultLang)
+      val hintText    = messagesApi("search.hint")(Lang.defaultLang)
 
-      val result = route(app, FakeRequest(GET, url)).get
+      val result  = route(app, FakeRequest(GET, url)).get
       val content = contentAsString(result)
 
       status(result) mustEqual OK

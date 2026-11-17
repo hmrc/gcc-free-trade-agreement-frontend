@@ -23,16 +23,16 @@ import play.api.data.FormError
 class SearchFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "search.error.required"
-  val lengthKey = "search.error.length"
-  val invalidKey = "search.error.invalid"
-  val maxLength = 100
+  val lengthKey   = "search.error.length"
+  val invalidKey  = "search.error.invalid"
+  val maxLength   = 100
 
   val form = new SearchFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
-    
+
     val validStrings: Gen[String] =
       Gen.alphaNumStr.suchThat(s => s.nonEmpty && s.length <= maxLength)
 
@@ -54,7 +54,7 @@ class SearchFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
-    
+
     "must not bind strings containing non-alphanumeric characters" in {
       val invalidInputs = Seq("abc!", "<script>", "£100", "a_b", "a-b")
       invalidInputs.foreach { input =>

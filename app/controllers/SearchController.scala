@@ -23,29 +23,27 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SearchView
 
-class SearchController @Inject()(
-                                        val controllerComponents: MessagesControllerComponents,
-                                        formProvider: SearchFormProvider,
-                                        view: SearchView
-                                        ) extends FrontendBaseController with I18nSupport {
+class SearchController @Inject() (
+  val controllerComponents: MessagesControllerComponents,
+  formProvider: SearchFormProvider,
+  view: SearchView
+) extends FrontendBaseController
+    with I18nSupport {
 
   private val form = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = Action {
-    implicit request =>
-
-      Ok(view(form, None))
+  def onPageLoad(): Action[AnyContent] = Action { implicit request =>
+    Ok(view(form, None))
   }
 
-  def onSubmit(): Action[AnyContent] = Action {
-    implicit request =>
-
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          BadRequest(view(formWithErrors, None)),
+  def onSubmit(): Action[AnyContent] = Action { implicit request =>
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => BadRequest(view(formWithErrors, None)),
         term => Ok(view(form.fill(term), Some(search(term))))
       )
   }
-  
+
   private def search(term: String): Seq[String] = Seq.empty
 }
