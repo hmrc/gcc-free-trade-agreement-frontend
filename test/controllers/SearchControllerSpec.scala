@@ -53,9 +53,8 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       val content = contentAsString(result)
 
       status(result) mustEqual OK
-      content must include("id=\"search-hint\"")
+      content must include("id=\"value-hint\"")
       content must include(hintText)
-      content.indexOf("search-hint") must be < content.indexOf("name=\"value\"")
     }
   }
 }

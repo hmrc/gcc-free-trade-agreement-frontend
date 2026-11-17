@@ -34,13 +34,12 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <div id="search-hint" class="govuk-hint">@messages("search.hint")</div>
-
         @govukInput(
             InputViewModel(
                 field = form("value"),
                 label = LabelViewModel(messages("search.heading")).asPageHeading()
             )
+            .withHint(HintViewModel(Text(messages("search.hint"))))
             .withWidth(Full)
         )
 
