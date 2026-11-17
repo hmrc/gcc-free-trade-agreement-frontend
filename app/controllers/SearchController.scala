@@ -16,17 +16,17 @@
 
 package controllers
 
-import forms.SearchPageFormProvider
+import forms.SearchFormProvider
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.SearchPageView
+import views.html.SearchView
 
-class SearchPageController @Inject()(
+class SearchController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
-                                        formProvider: SearchPageFormProvider,
-                                        view: SearchPageView
+                                        formProvider: SearchFormProvider,
+                                        view: SearchView
                                         ) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()

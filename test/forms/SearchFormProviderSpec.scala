@@ -20,14 +20,14 @@ import forms.behaviours.StringFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
 
-class SearchPageFormProviderSpec extends StringFieldBehaviours {
+class SearchFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "searchPage.error.required"
-  val lengthKey = "searchPage.error.length"
-  val invalidKey = "searchPage.error.invalid"
+  val requiredKey = "search.error.required"
+  val lengthKey = "search.error.length"
+  val invalidKey = "search.error.invalid"
   val maxLength = 100
 
-  val form = new SearchPageFormProvider()()
+  val form = new SearchFormProvider()()
 
   ".value" - {
 

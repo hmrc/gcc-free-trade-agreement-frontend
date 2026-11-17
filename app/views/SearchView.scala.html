@@ -26,9 +26,9 @@
 
 @(form: Form[_], results: Option[Seq[String]])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("searchPage.title"))) {
+@layout(pageTitle = title(form, messages("search.title"))) {
 
-    @formHelper(action = routes.SearchPageController.onSubmit()) {
+    @formHelper(action = routes.SearchController.onSubmit()) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -37,7 +37,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("searchPage.heading")).asPageHeading()
+                label = LabelViewModel(messages("search.heading")).asPageHeading()
             )
             .withWidth(Full)
         )
@@ -49,7 +49,7 @@
 
     @results.map { rs =>
         @if(rs.isEmpty) {
-            <p class="govuk-body">@messages("searchPage.noResults")</p>
+            <p class="govuk-body">@messages("search.noResults")</p>
         } else {
             <ul class="govuk-list govuk-list--bullet">
                 @rs.map { r => <li>@r</li> }

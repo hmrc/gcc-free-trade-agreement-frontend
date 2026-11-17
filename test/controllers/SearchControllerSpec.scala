@@ -23,11 +23,11 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class SearchPageControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
+class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
 
-  private val url = routes.SearchPageController.onPageLoad().url
+  private val url = routes.SearchController.onPageLoad().url
   
-  "SearchPage Controller" - {
+  "Search Controller" - {
     "must return OK for a GET" in {
       val result = route(app, FakeRequest(GET, url)).get
       status(result) mustEqual OK
