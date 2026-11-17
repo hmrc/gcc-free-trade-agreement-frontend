@@ -16,12 +16,12 @@
 
 package controllers
 
-import org.apache.pekko.http.scaladsl.model.HttpHeader.ParsingResult.Ok
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -43,6 +43,19 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "a" * 101)
       val result = route(app, request).get
       status(result) mustEqual BAD_REQUEST
+    }
+
+    "must show the hint text above the search box on a GET" in {
+      val messagesApi = app.injector.instanceOf[MessagesApi]
+      val hintText = messagesApi("search.hint")(Lang.defaultLang)
+
+      val result = route(app, FakeRequest(GET, url)).get
+      val content = contentAsString(result)
+
+      status(result) mustEqual OK
+      content must include("id=\"search-hint\"")
+      content must include(hintText)
+      content.indexOf("search-hint") must be < content.indexOf("name=\"value\"")
     }
   }
 }

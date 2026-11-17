@@ -32,4 +32,3 @@ search.error.required = Enter search
 search.error.length = Search must be 100 characters or less
 search.change.hidden = Search
 search.hint = Hint text to be confirmed
-search.backLink = Back
