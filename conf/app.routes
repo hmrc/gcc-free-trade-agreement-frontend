@@ -8,3 +8,5 @@ GET         /assets/*file                     controllers.Assets.versioned(path=
 
 GET        /search                        controllers.SearchController.onPageLoad()
 POST       /search                        controllers.SearchController.onSubmit()
+
+GET        /ftaRegistration                       controllers.FtaRegistrationController.onPageLoad()
