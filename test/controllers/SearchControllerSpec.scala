@@ -33,8 +33,8 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       status(result) mustEqual OK
     }
 
-    "must return OK for a POST with a valid alphanumeric term" in {
-      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "ABC123")
+    "must return OK for a POST with a valid POD reference number" in {
+      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "POD123456789012")
       val result  = route(app, request).get
       status(result) mustEqual OK
     }
@@ -55,6 +55,19 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       status(result) mustEqual OK
       content must include("id=\"value-hint\"")
       content must include(hintText)
+    }
+
+    "must return BAD_request and the format error for an incorrectly formatted term" in {
+      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "ABC123")
+      val result = route(app, request).get
+
+      val messagesApi = app.injector.instanceOf[MessagesApi]
+      val errorText = messagesApi("search.error.invalid")(Lang.defaultLang)
+
+      status(result) mustEqual BAD_REQUEST
+      contentAsString(result) must include(
+        errorText.replace("'", "&#x27;")
+      )
     }
   }
 }

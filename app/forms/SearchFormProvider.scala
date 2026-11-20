@@ -25,7 +25,7 @@ class SearchFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("search.error.required")
-        .verifying(regexp("^[A-Za-z0-9 ]+$", "search.error.invalid")
+        .verifying(regexp("^POD[0-9]{12}$", "search.error.invalid")
           )
     )
 }
