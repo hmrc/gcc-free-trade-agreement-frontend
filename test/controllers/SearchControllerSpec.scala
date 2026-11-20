@@ -25,7 +25,7 @@ import play.api.test.Helpers.*
 
 class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
 
-  private val url = routes.SearchController.onPageLoad().url
+  private val url = "/gcc-free-trade-agreement-frontend/search"
 
   "Search Controller" - {
     "must return OK for a GET" in {
@@ -57,7 +57,7 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       content must include(hintText)
     }
 
-    "must return BAD_request and the format error for an incorrectly formatted term" in {
+    "must return BAD_REQUEST and the format error for an incorrectly formatted term" in {
       val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "ABC123")
       val result  = route(app, request).get
 
