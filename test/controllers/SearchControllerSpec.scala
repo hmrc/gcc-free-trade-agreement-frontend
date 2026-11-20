@@ -59,10 +59,10 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
 
     "must return BAD_request and the format error for an incorrectly formatted term" in {
       val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "ABC123")
-      val result = route(app, request).get
+      val result  = route(app, request).get
 
       val messagesApi = app.injector.instanceOf[MessagesApi]
-      val errorText = messagesApi("search.error.invalid")(Lang.defaultLang)
+      val errorText   = messagesApi("search.error.invalid")(Lang.defaultLang)
 
       status(result) mustEqual BAD_REQUEST
       contentAsString(result) must include(
