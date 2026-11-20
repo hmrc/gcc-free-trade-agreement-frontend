@@ -23,6 +23,8 @@ import play.api.i18n.{Lang, MessagesApi}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
+import scala.util.Random
+
 class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
 
   private val url = "/gcc-free-trade-agreement-frontend/search"
@@ -34,7 +36,9 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
     }
 
     "must return OK for a POST with a valid POD reference number" in {
-      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "POD123456789012")
+      val pod = s"POD${Iterator.fill(12)(Random.nextInt(10)).mkString}"
+
+      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> pod)
       val result  = route(app, request).get
       status(result) mustEqual OK
     }
