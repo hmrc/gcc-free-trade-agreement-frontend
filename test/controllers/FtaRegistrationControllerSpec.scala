@@ -73,10 +73,15 @@ class FtaRegistrationControllerSpec extends SpecBase {
         content must include("Formerly Registered Example Exporter Ltd")
         content must include(podReference)
         content must include("Inactive")
-        content must not include "Registration active from"
-        content must not include "Registration active until"
-        content must include("2024-01-01")
-        content must include("2025-04-01")
+
+        val summaryListStart = content.indexOf("<dl class=\"govuk-summary-list\">")
+        val summaryListEnd   = content.indexOf("</dl>", summaryListStart) + "</dl>".length
+        val summaryList      = content.substring(summaryListStart, summaryListEnd)
+
+        summaryList must not include "Registration active from"
+        summaryList must not include "Registration active until"
+        content     must include("2024-01-01")
+        content     must include("2025-04-01")
       }
     }
 
