@@ -17,10 +17,18 @@
 package viewmodels
 
 case class FtaRegistrationViewModel(
-  companyName: String,
   podNumber: String,
+  matchFound: Boolean,
+  noMatchReason: Option[String],
+  companyName: Option[String],
+  status: Option[String],
+  activeFrom: Option[String],
+  activeUntil: Option[String],
+  validityPeriods: Seq[RegistrationValidityPeriodViewModel]
+)
+
+case class RegistrationValidityPeriodViewModel(
   status: String,
-  expiryFrom: String,
-  expiryTo: String,
-  history: String
+  validFrom: String,
+  validTo: String
 )

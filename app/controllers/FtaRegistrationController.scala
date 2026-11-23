@@ -19,28 +19,48 @@ package controllers
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.VerifyStatusService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.FtaRegistrationViewModel
 import views.html.FtaRegistrationView
 
-import scala.util.Random
-
 class FtaRegistrationController @Inject() (
   val controllerComponents: MessagesControllerComponents,
-  view: FtaRegistrationView
+  view: FtaRegistrationView,
+  verifyStatusService: VerifyStatusService
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = Action { implicit request =>
+  def onPageLoad(podReference: Option[String] = None): Action[AnyContent] = Action { implicit request =>
+    val searchedPod     = podReference.getOrElse(verifyStatusService.generateActivePodReference())
+    val response        = verifyStatusService.verifyStatus(searchedPod)
+    val validityPeriods = response.registrationValidityPeriods.map { period =>
+      viewmodels.RegistrationValidityPeriodViewModel(
+        status = userFacingStatus(period.status),
+        validFrom = period.validFrom,
+        validTo = period.validTo.getOrElse("Not specified")
+      )
+    }
+
+    val currentPeriod       = response.registrationValidityPeriods.lastOption
     val registrationDetails = FtaRegistrationViewModel(
-      companyName = "Testdata Company Ltd",
-      podNumber = s"POD${Iterator.fill(12)(Random.nextInt(10)).mkString}",
-      status = "Registered",
-      expiryFrom = "1 January 2026",
-      expiryTo = "31 December 2026",
-      history = "Registered on 1 January 2026"
+      podNumber = searchedPod,
+      matchFound = response.matchFound,
+      noMatchReason = response.matchNotFoundReason,
+      companyName = response.exporterCompanyName,
+      status = response.currentRegistrationStatus.map(userFacingStatus),
+      activeFrom = currentPeriod.map(_.validFrom),
+      activeUntil = currentPeriod.flatMap(_.validTo),
+      validityPeriods = validityPeriods
     )
 
     Ok(view(registrationDetails))
   }
+
+  private def userFacingStatus(status: String): String =
+    status match {
+      case "VALID"     => "Active"
+      case "NOT_VALID" => "Inactive"
+      case unexpected  => throw new IllegalArgumentException(s"Unsupported registration status: $unexpected")
+    }
 }

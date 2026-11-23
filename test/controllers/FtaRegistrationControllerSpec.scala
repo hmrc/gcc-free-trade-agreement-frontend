@@ -18,19 +18,20 @@ package controllers
 
 import base.SpecBase
 import play.api.test.FakeRequest
+import services.VerifyStatusService
 import play.api.test.Helpers._
 
 class FtaRegistrationControllerSpec extends SpecBase {
 
   "FtaRegistration Controller" - {
-    val podRegex = """(?s).*POD[0-9]{12}.*"""
-
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder().build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.FtaRegistrationController.onPageLoad().url)
+        val verifyStatusService = application.injector.instanceOf[VerifyStatusService]
+        val podReference        = verifyStatusService.generateActivePodReference()
+        val request             = FakeRequest(GET, routes.FtaRegistrationController.onPageLoad(Some(podReference)).url)
 
         val result = route(application, request).value
 
@@ -38,16 +39,60 @@ class FtaRegistrationControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         content must include("govuk-summary-list")
-        content must include("Check the account details")
-        content must include("Testdata Company Ltd")
-        content.matches(podRegex) mustEqual true
-        content must include("Company Name")
-        content must include("FTA Registration Status")
-        content must include("Expiry From")
-        content must include("Expiry To")
-        content must include("FTA Registration History")
+        content must include(s"Trader details for $podReference")
+        content must include("Example Exporter Ltd")
+        content must include(podReference)
+        content must include("UK trader exporter company name")
+        content must include("Registration status")
+        content must include("Registration active from")
+        content must include("Registration active until")
+        content must include("Active")
+        content must include("Registration History")
+        content must include("2026-01-01")
+        content must include("2026-04-24")
+        content must include("2026-09-01")
         content must include("Continue")
         content must include(s"""href="${routes.IndexController.onPageLoad().url}"""")
+      }
+    }
+
+    "must display the searched POD and inactive status for a previously registered trader" in {
+      val application = applicationBuilder().build()
+
+      running(application) {
+        val verifyStatusService = application.injector.instanceOf[VerifyStatusService]
+        val podReference        = verifyStatusService.generateInactivePodReference()
+        val request             = FakeRequest(
+          GET,
+          routes.FtaRegistrationController.onPageLoad(Some(podReference)).url
+        )
+        val result              = route(application, request).value
+        val content             = contentAsString(result)
+
+        status(result) mustEqual OK
+        content must include("Formerly Registered Example Exporter Ltd")
+        content must include(podReference)
+        content must include("Inactive")
+        content must not include "Registration active from"
+        content must not include "Registration active until"
+        content must include("2024-01-01")
+        content must include("2025-04-01")
+      }
+    }
+
+    "must display a no-match response for an unknown POD" in {
+      val application = applicationBuilder().build()
+
+      running(application) {
+        val verifyStatusService = application.injector.instanceOf[VerifyStatusService]
+        val searchedPod         = verifyStatusService.generatePodReference("333333")
+        val request             = FakeRequest(GET, routes.FtaRegistrationController.onPageLoad(Some(searchedPod)).url)
+        val result              = route(application, request).value
+        val content             = contentAsString(result)
+
+        status(result) mustEqual OK
+        content must include(searchedPod)
+        content must include("No authorisation was found")
       }
     }
   }

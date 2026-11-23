@@ -25,34 +25,54 @@
 @(registrationDetails: FtaRegistrationViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("ftaRegistration.title"))) {
-    <h1 class="govuk-heading-xl">@messages("ftaRegistration.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("ftaRegistration.heading", registrationDetails.podNumber)</h1>
 
-    @govukSummaryList(SummaryListViewModel(Seq(
-        SummaryListRowViewModel(
-            KeyViewModel(Text(messages("ftaRegistration.companyName"))),
-            ValueViewModel(Text(registrationDetails.companyName))
-        ),
-        SummaryListRowViewModel(
-            KeyViewModel(Text(messages("ftaRegistration.podNumber"))),
-            ValueViewModel(Text(registrationDetails.podNumber))
-        ),
-        SummaryListRowViewModel(
-            KeyViewModel(Text(messages("ftaRegistration.status"))),
-            ValueViewModel(Text(registrationDetails.status))
-        ),
-        SummaryListRowViewModel(
-            KeyViewModel(Text(messages("ftaRegistration.expiryFrom"))),
-            ValueViewModel(Text(registrationDetails.expiryFrom))
-        ),
-        SummaryListRowViewModel(
-            KeyViewModel(Text(messages("ftaRegistration.expiryTo"))),
-            ValueViewModel(Text(registrationDetails.expiryTo))
-        ),
-        SummaryListRowViewModel(
-            KeyViewModel(Text(messages("ftaRegistration.history"))),
-            ValueViewModel(Text(registrationDetails.history))
-        )
-    )))
+    @if(registrationDetails.matchFound) {
+        @govukSummaryList(SummaryListViewModel(
+            Seq(
+                SummaryListRowViewModel(
+                    KeyViewModel(Text(messages("ftaRegistration.companyName"))),
+                    ValueViewModel(Text(registrationDetails.companyName.getOrElse("")))
+                ),
+                SummaryListRowViewModel(
+                    KeyViewModel(Text(messages("ftaRegistration.status"))),
+                    ValueViewModel(Text(registrationDetails.status.getOrElse("")))
+                )
+            ) ++ (
+                if (registrationDetails.status.contains("Active")) Seq(
+                    SummaryListRowViewModel(
+                        KeyViewModel(Text(messages("ftaRegistration.activeFrom"))),
+                        ValueViewModel(Text(registrationDetails.activeFrom.getOrElse("")))
+                    ),
+                    SummaryListRowViewModel(
+                        KeyViewModel(Text(messages("ftaRegistration.activeUntil"))),
+                        ValueViewModel(Text(registrationDetails.activeUntil.getOrElse("Not specified")))
+                    )
+                ) else Seq.empty
+            )
+        ))
+
+        <h2 class="govuk-heading-m">@messages("ftaRegistration.history")</h2>
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">@messages("ftaRegistration.validFrom")</th>
+                    <th scope="col" class="govuk-table__header">@messages("ftaRegistration.validTo")</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @registrationDetails.validityPeriods.map { period =>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">@period.validFrom</td>
+                        <td class="govuk-table__cell">@period.validTo</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    } else {
+        <p class="govuk-body">@registrationDetails.noMatchReason.getOrElse(messages("ftaRegistration.noMatch"))</p>
+        <p class="govuk-body">@messages("ftaRegistration.podNumber"): @registrationDetails.podNumber</p>
+    }
 
     @govukButton(ButtonViewModel(Text(messages("site.continue"))).asLink(routes.IndexController.onPageLoad().url))
 }
