@@ -41,9 +41,7 @@ class SearchController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => BadRequest(view(formWithErrors, None)),
-        term => Ok(view(form.fill(term), Some(search(term))))
+        _ => Redirect(routes.FtaRegistrationController.onPageLoad())
       )
   }
-
-  private def search(term: String): Seq[String] = Seq.empty
 }

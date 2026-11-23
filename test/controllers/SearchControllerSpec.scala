@@ -33,10 +33,11 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       status(result) mustEqual OK
     }
 
-    "must return OK for a POST with a valid alphanumeric term" in {
+    "must redirect to the FTA registration page for a POST with a valid alphanumeric term" in {
       val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "ABC123")
       val result  = route(app, request).get
-      status(result) mustEqual OK
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(routes.FtaRegistrationController.onPageLoad().url)
     }
 
     "must return BAD_REQUEST for a POST with an empty term" in {

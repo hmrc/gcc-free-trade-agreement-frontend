@@ -32,3 +32,12 @@ search.error.required = Enter search
 search.error.length = Search must be 100 characters or less
 search.change.hidden = Search
 search.hint = Hint text to be confirmed
+
+ftaRegistration.title = Check the account details
+ftaRegistration.heading = Check the account details
+ftaRegistration.companyName = Company Name
+ftaRegistration.podNumber = POD Number
+ftaRegistration.status = FTA Registration Status
+ftaRegistration.expiryFrom = Expiry From
+ftaRegistration.expiryTo = Expiry To
+ftaRegistration.history = FTA Registration History
