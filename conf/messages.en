@@ -29,7 +29,7 @@ search.title = search
 search.heading = Search Page
 search.checkYourAnswersLabel = search
 search.error.required = Enter search
-search.error.length = Search must be 100 characters or less
+search.error.invalid = POD followed by 12 digits
 search.change.hidden = Search
 search.hint = Hint text to be confirmed
 

@@ -23,9 +23,7 @@ import play.api.data.FormError
 class SearchFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "search.error.required"
-  val lengthKey   = "search.error.length"
   val invalidKey  = "search.error.invalid"
-  val maxLength   = 100
 
   val form = new SearchFormProvider()()
 
@@ -33,20 +31,13 @@ class SearchFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "value"
 
-    val validStrings: Gen[String] =
-      Gen.alphaNumStr.suchThat(s => s.nonEmpty && s.length <= maxLength)
+    val validReferences: Gen[String] =
+      Gen.listOfN(12, Gen.numChar).map(digits => "POD" + digits.mkString)
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      validStrings
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      validReferences
     )
 
     behave like mandatoryField(
@@ -55,11 +46,37 @@ class SearchFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
 
-    "must not bind strings containing non-alphanumeric characters" in {
-      val invalidInputs = Seq("abc!", "<script>", "£100", "a_b", "a-b")
+    "must not bind values in the wrong format" in {
+      val invalidInputs = Seq(
+        "ABC123",
+        "POD12345678901",
+        "POD1234567890123",
+        "POD12345678901A",
+        "123456789012",
+        "XYZ123456789012",
+        "POD123456789012!"
+      )
+
       invalidInputs.foreach { input =>
-        val result = form.bind(Map(fieldName -> input)).apply(fieldName)
-        result.errors must contain only FormError(fieldName, invalidKey, Seq("^[A-Za-z0-9 ]+$"))
+        val result = form.bind(Map(fieldName -> input))(fieldName)
+        result.errors.map(_.message) mustEqual Seq(invalidKey)
+      }
+    }
+
+    "must accept valid references with unwanted characters and clean them up" in {
+      val inputs = Seq(
+        "POD123456789012 ",
+        " POD123456789012",
+        "POD 1234 5678 9012",
+        "POD-123456789012",
+        "POD123456789012\u00A0",
+        "pod123456789012"
+      )
+
+      inputs.foreach { input =>
+        val result = form.bind(Map("value" -> input))
+        result.errors mustBe empty
+        result.value.value mustEqual "POD123456789012"
       }
     }
   }
