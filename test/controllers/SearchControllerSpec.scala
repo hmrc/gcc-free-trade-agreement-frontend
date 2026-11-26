@@ -23,9 +23,11 @@ import play.api.i18n.{Lang, MessagesApi}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
+import scala.util.Random
+
 class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
 
-  private val url = routes.SearchController.onPageLoad().url
+  private val url = "/gcc-free-trade-agreement-frontend/search"
 
   "Search Controller" - {
     "must return OK for a GET" in {
@@ -33,8 +35,9 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       status(result) mustEqual OK
     }
 
-    "must redirect to the FTA registration page for a POST with a valid alphanumeric term" in {
-      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "ABC123")
+    "must redirect to the FTA registration page for a POST with a valid POD reference number" in {
+      val pod     = s"POD${Iterator.fill(12)(Random.nextInt(10)).mkString}"
+      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> pod)
       val result  = route(app, request).get
       status(result) mustEqual SEE_OTHER
       redirectLocation(result) mustEqual Some(routes.FtaRegistrationController.onPageLoad().url)
@@ -56,6 +59,19 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       status(result) mustEqual OK
       content must include("id=\"value-hint\"")
       content must include(hintText)
+    }
+
+    "must return BAD_REQUEST and the format error for an incorrectly formatted term" in {
+      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "ABC123")
+      val result  = route(app, request).get
+
+      val messagesApi = app.injector.instanceOf[MessagesApi]
+      val errorText   = messagesApi("search.error.invalid")(Lang.defaultLang)
+
+      status(result) mustEqual BAD_REQUEST
+      contentAsString(result) must include(
+        errorText.replace("'", "&#x27;")
+      )
     }
   }
 }

@@ -22,14 +22,12 @@ import play.api.data.Form
 
 class SearchFormProvider @Inject() extends Mappings {
 
+  private val ignoredCharacters = "[\\s\u00A0\u200B-\u200D\uFEFF-]"
+
   def apply(): Form[String] =
     Form(
       "value" -> text("search.error.required")
-        .verifying(
-          firstError(
-            maxLength(100, "search.error.length"),
-            regexp("^[A-Za-z0-9 ]+$", "search.error.invalid")
-          )
-        )
+        .transform[String](_.replaceAll(ignoredCharacters, "").toUpperCase, identity)
+        .verifying(regexp("^POD[0-9]{12}$", "search.error.invalid"))
     )
 }
