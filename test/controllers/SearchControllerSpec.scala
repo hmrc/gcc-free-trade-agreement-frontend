@@ -22,12 +22,11 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-
-import scala.util.Random
+import services.VerifyStatusService
 
 class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
 
-  private val url = "/gcc-free-trade-agreement-frontend/search"
+  private val url = routes.SearchController.onPageLoad().url
 
   "Search Controller" - {
     "must return OK for a GET" in {
@@ -35,12 +34,13 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       status(result) mustEqual OK
     }
 
-    "must redirect to the FTA registration page for a POST with a valid POD reference number" in {
-      val pod     = s"POD${Iterator.fill(12)(Random.nextInt(10)).mkString}"
-      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> pod)
-      val result  = route(app, request).get
+    "must redirect to the FTA registration page with a valid POD reference" in {
+      val verifyStatusService = app.injector.instanceOf[VerifyStatusService]
+      val podReference        = verifyStatusService.generateActivePodReference()
+      val request             = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> podReference)
+      val result              = route(app, request).get
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.FtaRegistrationController.onPageLoad().url)
+      redirectLocation(result) mustEqual Some(routes.FtaRegistrationController.onPageLoad(Some(podReference)).url)
     }
 
     "must return BAD_REQUEST for a POST with an empty term" in {

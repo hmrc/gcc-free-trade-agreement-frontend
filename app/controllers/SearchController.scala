@@ -41,7 +41,7 @@ class SearchController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => BadRequest(view(formWithErrors, None)),
-        _ => Redirect(routes.FtaRegistrationController.onPageLoad())
+        podReference => Redirect(routes.FtaRegistrationController.onPageLoad(Some(podReference)))
       )
   }
 }
