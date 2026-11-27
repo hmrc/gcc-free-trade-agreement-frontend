@@ -1,4 +1,4 @@
-service.name = gcc-free-trade-agreement-frontend
+service.name = Check if a UK exporter is registered for the UK-Gulf Cooperation Council Free Trade Agreement
 
 site.back = Back
 site.remove = Remove
@@ -6,6 +6,7 @@ site.change = Change
 site.no = No
 site.yes = Yes
 site.continue = Continue
+site.search = Search
 site.start = Start now
 site.startAgain = Start again
 site.govuk = GOV.UK
@@ -25,13 +26,15 @@ index.title = gcc-free-trade-agreement-frontend
 index.heading = gcc-free-trade-agreement-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
 
-search.title = Search for a POD reference
-search.heading = Search for a POD reference
+search.title = Enter the preferential origin database (POD) number
+search.heading = Enter the preferential origin database (POD) number
 search.checkYourAnswersLabel = search
-search.error.required = Enter a POD reference
-search.error.invalid = Enter a POD reference in the format POD followed by 12 digits
+search.error.required = Enter a POD number
+search.error.invalid = Enter a POD number starting with POD followed by 12 digits
 search.change.hidden = Search
-search.hint = Enter a POD reference in the format POD followed by 12 digits
+search.hint = You can find the number on the exporter’s origin declaration, for example POD123456789012
+search.button = Search
+search.superuserLink = Manage user enrolments
 
 ftaRegistration.title = Trader details
 ftaRegistration.heading = Trader details for {0}

@@ -6,7 +6,7 @@ GET         /                                 controllers.IndexController.onPage
 
 GET         /assets/*file                     controllers.Assets.versioned(path="/public", file: Asset)
 
-GET        /search                        controllers.SearchController.onPageLoad()
-POST       /search                        controllers.SearchController.onSubmit()
+GET        /search-pod-number                       controllers.SearchController.onPageLoad()
+POST       /search-pod-number                       controllers.SearchController.onSubmit()
 
 GET        /ftaRegistration                       controllers.FtaRegistrationController.onPageLoad(podReference: Option[String] ?= None)

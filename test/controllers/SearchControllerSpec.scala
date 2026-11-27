@@ -16,6 +16,7 @@
 
 package controllers
 
+import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -23,10 +24,12 @@ import play.api.i18n.{Lang, MessagesApi}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.VerifyStatusService
+import forms.SearchFormProvider
+import views.html.SearchView
 
 class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
 
-  private val url = routes.SearchController.onPageLoad().url
+  private val url = "/gcc-free-trade-agreement-frontend/search-pod-number"
 
   "Search Controller" - {
     "must return OK for a GET" in {
@@ -34,7 +37,7 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       status(result) mustEqual OK
     }
 
-    "must redirect to the FTA registration page with a valid POD reference" in {
+    "must redirect to the FTA registration page with a valid POD number" in {
       val verifyStatusService = app.injector.instanceOf[VerifyStatusService]
       val podReference        = verifyStatusService.generateActivePodReference()
       val request             = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> podReference)
@@ -44,7 +47,7 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
     }
 
     "must return BAD_REQUEST for a POST with an empty term" in {
-      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "a" * 101)
+      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "")
       val result  = route(app, request).get
       status(result) mustEqual BAD_REQUEST
     }
@@ -72,6 +75,71 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       contentAsString(result) must include(
         errorText.replace("'", "&#x27;")
       )
+    }
+
+    "must show the heading and Search button on a GET" in {
+      val messagesApi = app.injector.instanceOf[MessagesApi]
+      val content     = contentAsString(route(app, FakeRequest(GET, url)).get)
+
+      content must include(messagesApi("search.heading")(Lang.defaultLang))
+      content must include(messagesApi("search.button")(Lang.defaultLang))
+    }
+
+    "must show the wrong format error in the title, summary and field" in {
+      val messagesApi = app.injector.instanceOf[MessagesApi]
+      val request     = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "ABC123")
+      val content     = contentAsString(route(app, request).get)
+
+      content must include("Error: " + messagesApi("search.title")(Lang.defaultLang))
+      content must include("There is a problem")
+      content must include(messagesApi("search.error.invalid")(Lang.defaultLang))
+    }
+
+    "must accept a reference with spaces and redirect with the cleaned value" in {
+      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "POD 1234 5678 9012 ")
+      val result  = route(app, request).get
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(
+        routes.FtaRegistrationController.onPageLoad(Some("POD123456789012")).url
+      )
+    }
+
+    "must display the superuser link when the user is a superuser" in {
+      val searchView   = app.injector.instanceOf[SearchView]
+      val formProvider = app.injector.instanceOf[SearchFormProvider]
+      val messagesApi  = app.injector.instanceOf[MessagesApi]
+      val request      = FakeRequest()
+
+      val content = searchView(
+        formProvider(),
+        None,
+        true
+      )(request, messagesApi.preferred(request)).toString
+
+      content must include("Manage user enrolments")
+    }
+
+    "must not display the superuser link when the user is not a superuser" in {
+      val searchView   = app.injector.instanceOf[SearchView]
+      val formProvider = app.injector.instanceOf[SearchFormProvider]
+      val messagesApi  = app.injector.instanceOf[MessagesApi]
+      val request      = FakeRequest()
+
+      val content = searchView(
+        formProvider(),
+        None,
+        false
+      )(request, messagesApi.preferred(request)).toString
+
+      content must not include "Manage user enrolments"
+    }
+
+    "must display the superuser link with a placeholder destination" in {
+      val result = route(app, FakeRequest(GET, url)).value
+
+      status(result) mustBe OK
+      contentAsString(result) must include("""href="#" """.trim)
     }
   }
 }

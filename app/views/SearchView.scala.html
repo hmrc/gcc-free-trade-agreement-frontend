@@ -24,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], results: Option[Seq[String]])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], results: Option[Seq[String]], isSuperuser: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("search.title"))) {
 
@@ -44,7 +44,7 @@
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages("site.search"))
         )
     }
 
@@ -56,5 +56,13 @@
                 @rs.map { r => <li>@r</li> }
             </ul>
         }
+    }
+
+    @if(isSuperuser) {
+        <div class="govuk-inset-text">
+            <a class="govuk-link" href="#">
+                @messages("search.superuserLink")
+            </a>
+        </div>
     }
 }

@@ -32,15 +32,17 @@ class SearchController @Inject() (
 
   private val form = formProvider()
 
+  private val isSuperuser = true
+
   def onPageLoad(): Action[AnyContent] = Action { implicit request =>
-    Ok(view(form, None))
+    Ok(view(form, None, isSuperuser))
   }
 
   def onSubmit(): Action[AnyContent] = Action { implicit request =>
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => BadRequest(view(formWithErrors, None)),
+        formWithErrors => BadRequest(view(formWithErrors, None, isSuperuser)),
         podReference => Redirect(routes.FtaRegistrationController.onPageLoad(Some(podReference)))
       )
   }
