@@ -26,7 +26,7 @@ import services.VerifyStatusService
 
 class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
 
-  private val url = routes.SearchController.onPageLoad().url
+  private val url = "/gcc-free-trade-agreement-frontend/search-pod-number"
 
   "Search Controller" - {
     "must return OK for a GET" in {
@@ -34,7 +34,7 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       status(result) mustEqual OK
     }
 
-    "must redirect to the FTA registration page with a valid POD reference" in {
+    "must redirect to the FTA registration page with a valid POD number" in {
       val verifyStatusService = app.injector.instanceOf[VerifyStatusService]
       val podReference        = verifyStatusService.generateActivePodReference()
       val request             = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> podReference)
@@ -44,7 +44,7 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
     }
 
     "must return BAD_REQUEST for a POST with an empty term" in {
-      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "a" * 101)
+      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "")
       val result  = route(app, request).get
       status(result) mustEqual BAD_REQUEST
     }
