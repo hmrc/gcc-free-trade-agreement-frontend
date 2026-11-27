@@ -34,6 +34,7 @@ search.error.invalid = Enter a POD number starting with POD followed by 12 digit
 search.change.hidden = Search
 search.hint = You can find the number on the exporter’s origin declaration, for example POD123456789012
 search.button = Search
+search.superuserLink = Manage user enrolments
 
 ftaRegistration.title = Trader details
 ftaRegistration.heading = Trader details for {0}
