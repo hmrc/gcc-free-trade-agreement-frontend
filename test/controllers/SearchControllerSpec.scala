@@ -106,10 +106,10 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
     }
 
     "must display the superuser link when the user is a superuser" in {
-      val searchView = app.injector.instanceOf[SearchView]
+      val searchView   = app.injector.instanceOf[SearchView]
       val formProvider = app.injector.instanceOf[SearchFormProvider]
-      val messagesApi = app.injector.instanceOf[MessagesApi]
-      val request = FakeRequest()
+      val messagesApi  = app.injector.instanceOf[MessagesApi]
+      val request      = FakeRequest()
 
       val content = searchView(
         formProvider(),
@@ -121,10 +121,10 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
     }
 
     "must not display the superuser link when the user is not a superuser" in {
-      val searchView = app.injector.instanceOf[SearchView]
+      val searchView   = app.injector.instanceOf[SearchView]
       val formProvider = app.injector.instanceOf[SearchFormProvider]
-      val messagesApi = app.injector.instanceOf[MessagesApi]
-      val request = FakeRequest()
+      val messagesApi  = app.injector.instanceOf[MessagesApi]
+      val request      = FakeRequest()
 
       val content = searchView(
         formProvider(),
