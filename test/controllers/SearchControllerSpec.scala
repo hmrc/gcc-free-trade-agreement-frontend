@@ -73,5 +73,33 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
         errorText.replace("'", "&#x27;")
       )
     }
+
+    "must show the heading and Search button on a GET" in {
+      val messagesApi = app.injector.instanceOf[MessagesApi]
+      val content     = contentAsString(route(app, FakeRequest(GET, url)).get)
+
+      content must include(messagesApi("search.heading")(Lang.defaultLang))
+      content must include(messagesApi("search.button")(Lang.defaultLang))
+    }
+
+    "must show the wrong format error in the title, summary and field" in {
+      val messagesApi = app.injector.instanceOf[MessagesApi]
+      val request     = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "ABC123")
+      val content     = contentAsString(route(app, request).get)
+
+      content must include("Error: " + messagesApi("search.title")(Lang.defaultLang))
+      content must include("There is a problem")
+      content must include(messagesApi("search.error.invalid")(Lang.defaultLang))
+    }
+
+    "must accept a reference with spaces and redirect with the cleaned value" in {
+      val request = FakeRequest(POST, url).withFormUrlEncodedBody("value" -> "POD 1234 5678 9012 ")
+      val result  = route(app, request).get
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(
+        routes.FtaRegistrationController.onPageLoad(Some("POD123456789012")).url
+      )
+    }
   }
 }
