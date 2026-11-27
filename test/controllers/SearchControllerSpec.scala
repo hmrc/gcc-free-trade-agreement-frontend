@@ -16,6 +16,7 @@
 
 package controllers
 
+import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -23,6 +24,8 @@ import play.api.i18n.{Lang, MessagesApi}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.VerifyStatusService
+import forms.SearchFormProvider
+import views.html.SearchView
 
 class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -100,6 +103,43 @@ class SearchControllerSpec extends AnyFreeSpec with Matchers with GuiceOneAppPer
       redirectLocation(result) mustEqual Some(
         routes.FtaRegistrationController.onPageLoad(Some("POD123456789012")).url
       )
+    }
+
+    "must display the superuser link when the user is a superuser" in {
+      val searchView = app.injector.instanceOf[SearchView]
+      val formProvider = app.injector.instanceOf[SearchFormProvider]
+      val messagesApi = app.injector.instanceOf[MessagesApi]
+      val request = FakeRequest()
+
+      val content = searchView(
+        formProvider(),
+        None,
+        true
+      )(request, messagesApi.preferred(request)).toString
+
+      content must include("Manage user enrolments")
+    }
+
+    "must not display the superuser link when the user is not a superuser" in {
+      val searchView = app.injector.instanceOf[SearchView]
+      val formProvider = app.injector.instanceOf[SearchFormProvider]
+      val messagesApi = app.injector.instanceOf[MessagesApi]
+      val request = FakeRequest()
+
+      val content = searchView(
+        formProvider(),
+        None,
+        false
+      )(request, messagesApi.preferred(request)).toString
+
+      content must not include "Manage user enrolments"
+    }
+
+    "must display the superuser link with a placeholder destination" in {
+      val result = route(app, FakeRequest(GET, url)).value
+
+      status(result) mustBe OK
+      contentAsString(result) must include("""href="#" """.trim)
     }
   }
 }
